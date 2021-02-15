@@ -1,1 +1,227 @@
-Hello
+# install.packages("timelineS")
+# install.packages("dplyr")
+# install.packages("MCDA")
+# install.packages("ggplot2")
+# install.packages("scales")
+# install.packages("reshape2")
+# install.packages("tibble")
+# install.packages("lubridate")
+
+rm (list = ls())
+cat("\014")  
+
+library(timelineS)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+library(rPref)
+library(mco)
+library(MASS)
+
+
+plot.timeline <- function(lifetime, events.name, start.Date, plot.Name) {
+  dataP <- data.frame(Events = events.name, Event_Dates = ymd(start.Date) +
+                        years(lifetime))
+  timelineS(dataP, main = plot.Name,
+            labels = events.name, label.direction = "up", label.position = 3)
+}
+
+
+dist.Events <- function (lifetime, events, start.Date, option.Name) {
+  #sort the events
+  events <- sort(events, decreasing = T)
+  #create the distribution of the events
+  distribution.events <- sapply(events, seq, from = 0, to = lifetime)
+  
+  #all events unlisted
+  all.events <- melt(distribution.events)
+  colnames(all.events) <- c("frequency", "event")
+  #sort the events ascending
+  all.events <- all.events[order(all.events$frequency),]
+  #get the unique sequence of events
+  unique.events <- all.events[!duplicated(all.events$frequency),]
+  unique.events$event[which(unique.events$frequency == 0)] <- "DC"
+  #plot the timeline
+  #plot.timeline(unique.events$frequency, unique.events$event, start.Date, option.Name)
+  return(unique.events)
+}
+
+combine.lifeTimelines <- function(product.1, product.2,product.3,product.4,product.5, p1.dur, p2.dur, p3.dur, p4.dur, p5.dur) {
+  #function body
+
+  base <- list(Names = c(), frequency = c(), duration = c())
+ 
+  base$frequency <- sort(unique(c(product.1$frequency,
+                                  product.2$frequency)),
+                         decreasing = FALSE)
+ 
+  base$Names[1] <- "Construction"
+  base$duration[1] <- 0
+  base$Names[length(base$frequency)] <- "END"
+  base$duration[length(base$frequency)] <- 0
+
+
+  for(index in 2:(length(base$frequency) - 1)) {
+    phase.1 <- product.1$event[which(product.1$frequency ==
+                                       base$frequency[index])]
+    phase.2 <- product.2$event[which(product.2$frequency ==
+                                       base$frequency[index])]
+    if(length(phase.1) != 0 && length(phase.2) != 0) {
+      base$Names[index] <- paste(phase.1, phase.2)
+      base$duration[index] <- max(p1.dur[which(names(p1.dur) == phase.1)],
+                                  p2.dur[which(names(p2.dur) == phase.2)])
+    } else if(length(phase.1) != 0 && length(phase.2) == 0) {
+      base$Names[index] <- phase.1
+      base$duration[index] <- p1.dur[which(names(p1.dur) == phase.1)]
+    } else if (length(phase.1) == 0 && length(phase.2) != 0) {
+      base$Names[index] <- phase.2
+      base$duration[index] <- p2.dur[which(names(p2.dur) == phase.2)]
+    } else {
+      base$duration[index] <- 0
+    }
+  }
+  return(base)
+}
+
+par(mfrow = c(2, 1))
+start.Date = "2021-01-01"
+lifetime <- 100
+
+#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX------------Change
+events.Op1.Bridge = c(SDO = 15, M = 5, DR = 30, END = lifetime)
+duration.ev.Bridge <- c(SDO = 7, M = 2, DR = 21) #Bridge
+events.Op1.Pylon <- c(SDO.r = 17, M.r = 7, R.r = 35, END = lifetime) #road
+duration.ev.Pylon <- c(SDO.r = 7, M.r = 2, R.r = 21)
+events.Op1.Tunnel <- c(SDO.r = 17, M.r = 7, R.r = 35, END = lifetime) #road
+duration.ev.Tunnel <- c(SDO.r = 7, M.r = 2, R.r = 21)
+events.Op1.Pavement <- c(SDO.r = 17, M.r = 7, R.r = 35, END = lifetime) #road
+duration.ev.Pavement <- c(SDO.r = 7, M.r = 2, R.r = 21)
+events.Op1.Barrier <- c(SDO.r = 17, M.r = 7, R.r = 35, END = lifetime) #road
+duration.ev.Barrier <- c(SDO.r = 7, M.r = 2, R.r = 21)
+
+
+design.Options.Bridge <- list(design.Op1.Bridge <- "Steel girder & precast concrete deck")
+design.Options.Pylon <- list(design.Op1.Pylon <- "Reinforced concrete cross section")
+#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX------------Change
+design.Options.Tunnel <- list(design.Op1.Tunnel <- "Design opt????????????")
+design.Options.Pavement <- list(design.Op1.Pavement <- "Design opt?????????")
+design.Options.Barrier <- list(design.Op1.Barrier <- "GFRC Guard Barriers and Steel Crash Barrier")
+
+
+maintenance.Bridge <- dist.Events(lifetime, events.Op1.Bridge, start.Date, design.Options.Bridge)
+maintenance.Pylon <- dist.Events(lifetime, events.Op1.Pylon, start.Date, design.Options.Pylon)
+maintenance.Tunnel <- dist.Events(lifetime, events.Op1.Tunnel, start.Date, design.Options.Tunnel)
+maintenance.Pavement <- dist.Events(lifetime, events.Op1.Pavement, start.Date, design.Options.Pavement)
+maintenance.Barrier <- dist.Events(lifetime, events.Op1.Barrier, start.Date, design.Options.Barrier)
+
+integrated.interv <- combine.lifeTimelines(maintenance.Bridge, maintenance.Pylon,maintenance.Tunnel,maintenance.Pavement,maintenance.Barrier, duration.ev.Bridge, duration.ev.Pylon,duration.ev.Tunnel,duration.ev.Pavement,duration.ev.Barrier)
+
+sum(integrated.interv$duration)
+
+
+
+#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX------------Change
+events.Op1.Bridge = c(SDO = 15, M = 5, DR = 30, END = lifetime)
+duration.ev.Bridge <- c(SDO = 7, M = 2, DR = 21)
+events.Op1.Pylon <- c(SDO.r = 17, M.r = 7, R.r = 35, END = lifetime) 
+duration.ev.Pylon <- c(SDO.r = 7, M.r = 2, R.r = 21)
+events.Op1.Tunnel <- c(SDO.r = 17, M.r = 7, R.r = 35, END = lifetime)
+duration.ev.Tunnel <- c(SDO.r = 7, M.r = 2, R.r = 21)
+events.Op1.Pavement <- c(SDO.r = 17, M.r = 7, R.r = 35, END = lifetime)
+duration.ev.Pavement <- c(SDO.r = 7, M.r = 2, R.r = 21)
+events.Op1.Barrier <- c(SDO.r = 17, M.r = 7, R.r = 35, END = lifetime)
+duration.ev.Barrier <- c(SDO.r = 7, M.r = 2, R.r = 21)
+design.Options.Bridge <- list(design.Op1.Bridge <- "Steel girder & precast concrete deck")
+design.Options.Pylon <- list(design.Op1.Pylon <- "Reinforced concrete cross section")
+design.Options.Tunnel <- list(design.Op1.Tunnel <- "Design opt????????????")
+design.Options.Pavement <- list(design.Op1.Pavement <- "Design opt?????????")
+design.Options.Barrier <- list(design.Op1.Barrier <- "GFRC Guard Barriers and Steel Crash Barrier")
+maintenance.Bridge <- dist.Events(lifetime, events.Op1.Bridge, start.Date, design.Options.Bridge)
+maintenance.Pylon <- dist.Events(lifetime, events.Op1.Pylon, start.Date, design.Options.Pylon)
+maintenance.Tunnel <- dist.Events(lifetime, events.Op1.Tunnel, start.Date, design.Options.Tunnel)
+maintenance.Pavement <- dist.Events(lifetime, events.Op1.Pavement, start.Date, design.Options.Pavement)
+maintenance.Barrier <- dist.Events(lifetime, events.Op1.Barrier, start.Date, design.Options.Barrier)
+integrated.interv <- combine.lifeTimelines(maintenance.Bridge, maintenance.Pylon,maintenance.Tunnel,maintenance.Pavement,maintenance.Barrier, duration.ev.Bridge, duration.ev.Pylon,duration.ev.Tunnel,duration.ev.Pavement,duration.ev.Barrier)
+sum(integrated.interv$duration)
+
+
+
+
+design.explore <- function(events1, events2, events3,events4,events5) {
+  results <- c()
+  for(i in 1: dim(events1)[1]) {
+    ev1 <- unlist(events1[i, ])
+    dist.1 <- dist.Events(lifetime, ev1, start.Date, design.Options.Bridge)
+    dur.ev1 <- ev1/2
+    for (j in 1: dim(events1)[1]) {
+      ev2 <- unlist(events2[j, ])
+      dist.2 <- dist.Events(lifetime, ev2, start.Date, design.Options.Pylon)
+      dur.ev2 <- ev2/2
+      for (k in 1: dim(events1)[1]) {
+        ev3 <- unlist(events3[k, ])
+        dist.3 <- dist.Events(lifetime, ev3, start.Date, design.Options.Tunnel)
+        dur.ev3 <- ev3/2
+        for (l in 1: dim(events1)[1]) {
+          ev4 <- unlist(events4[l, ])
+          dist.4 <- dist.Events(lifetime, ev4, start.Date, design.Options.Pavement)
+          dur.ev4 <- ev4/2
+          for (m in 1: dim(events1)[1]) {
+            ev5 <- unlist(events5[m, ])
+            dist.5 <- dist.Events(lifetime, ev5, start.Date, design.Options.Barrier)
+            dur.ev5 <- ev5/2
+          combined.lifetime <- combine.lifeTimelines(dist.1, dist.2,dist.3, dist.4,dist.5,
+                                                     dur.ev1, dur.ev2, dur.ev3, dur.ev4, dur.ev5)
+          min.dist.int <- min(abs(combined.lifetime$frequency[1:(length(combined.lifetime$frequency) - 1)] -
+                                    combined.lifetime$frequency[2:length(combined.lifetime$frequency)]))
+          results <- rbind(results, c(ev1, ev2, ev3, ev4, ev5, dur = sum(combined.lifetime$duration), dist.inter = min.dist.int))
+          }
+        }
+      }
+    }
+  }
+  return(as.data.frame(results))
+}
+
+
+
+
+n.grid <- 5
+
+events.grid.Bridge <- expand.grid(SDO = sample(seq(1,20, by = 1), n.grid),
+                                  M = sample(seq(2,9,1), n.grid),
+                                  DR = sample(seq(2, 35, 1), n.grid))
+
+events.grid.Pylon <- expand.grid(SDO.r = sample(seq(3, 25, by = 1), n.grid),
+                                M.r = sample(seq(1,10,1), n.grid),
+                                R.r = sample(seq(2, 37, 1), n.grid))
+
+events.grid.Tunnel <- expand.grid(SDO.r = sample(seq(5, 25, by = 1), n.grid),
+                                M.r = sample(seq(2,15,1), n.grid),
+                                R.r = sample(seq(3, 43, 1), n.grid))
+
+events.grid.Pavement <- expand.grid(SDO.r = sample(seq(6, 25, by = 1), n.grid),
+                                M.r = sample(seq(1,14,1), n.grid),
+                                R.r = sample(seq(2, 51, 1), n.grid))
+
+events.grid.Barrier <- expand.grid(SDO.r = sample(seq(2, 25, by = 1), n.grid),
+                                M.r = sample(seq(6,13,1), n.grid),
+                                R.r = sample(seq(1, 41, 1), n.grid))
+
+response.space <- design.explore(events.grid.Bridge,  events.grid.Pylon, events.grid.Tunnel, events.grid.Pavement, events.grid.Barrier)
+
+p <- low(dur)* high(dist.inter)
+
+
+sky <- psel(response.space, p)
+
+
+pareto2 <- psel(response.space, p, top = nrow(response.space))
+
+
+ggplot(response.space, aes(x = dur, y = dist.inter)) +
+  geom_point(shape = 21) +
+  geom_point(data = pareto2, size = 3, aes(color = factor(pareto2$.level)))
+
+
+
