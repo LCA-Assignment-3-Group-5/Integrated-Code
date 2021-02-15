@@ -47,11 +47,13 @@ dist.Events <- function (lifetime, events, start.Date, option.Name) {
   return(unique.events)
 }
 
+
+
 combine.lifeTimelines <- function(product.1, product.2,product.3,product.4,product.5, p1.dur, p2.dur, p3.dur, p4.dur, p5.dur) {
   #function body
 
   base <- list(Names = c(), frequency = c(), duration = c())
- 
+ #XXXXXXXXXXXXXXXXXXXXXXXXXXX--------------Changes
   base$frequency <- sort(unique(c(product.1$frequency,
                                   product.2$frequency)),
                          decreasing = FALSE)
