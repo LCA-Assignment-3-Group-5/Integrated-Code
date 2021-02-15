@@ -90,13 +90,13 @@ combine.lifeTimelines <- function(product.1, product.2,product.3,product.4,produ
       base$duration[index] <- p2.dur[which(names(p2.dur) == phase.2)]
     } else if (length(phase.1) == 0 && length(phase.2) == 0 && length(phase.3) != 0 && length(phase.4) == 0&& length(phase.5) == 0) {
       base$Names[index] <- phase.3
-      base$duration[index] <- p3.dur[which(names(p2.dur) == phase.3)]
+      base$duration[index] <- p3.dur[which(names(p3.dur) == phase.3)]
     } else if (length(phase.1) == 0 && length(phase.2) == 0 && length(phase.3) == 0 && length(phase.4) != 0&& length(phase.5) == 0) {
       base$Names[index] <- phase.4
-      base$duration[index] <- p4.dur[which(names(p2.dur) == phase.4)]
+      base$duration[index] <- p4.dur[which(names(p4.dur) == phase.4)]
     } else if (length(phase.1) == 0 && length(phase.2) == 0 && length(phase.3) == 0 && length(phase.4) == 0&& length(phase.5) != 0) {
       base$Names[index] <- phase.5
-      base$duration[index] <- p5.dur[which(names(p2.dur) == phase.5)]
+      base$duration[index] <- p5.dur[which(names(p5.dur) == phase.5)]
     } else {
       base$duration[index] <- 0
     }
