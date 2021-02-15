@@ -48,37 +48,55 @@ dist.Events <- function (lifetime, events, start.Date, option.Name) {
 }
 
 
-
-combine.lifeTimelines <- function(product.1, product.2,product.3,product.4,product.5, p1.dur, p2.dur, p3.dur, p4.dur, p5.dur) {
-  #function body
+combine.lifeTimelines <- function(product.1, product.2,product.3,product.4,product.5, p1.dur, p2.dur, p3.dur, p4.dur, p5.dur) {  
 
   base <- list(Names = c(), frequency = c(), duration = c())
- #XXXXXXXXXXXXXXXXXXXXXXXXXXX--------------Changes
+  
   base$frequency <- sort(unique(c(product.1$frequency,
-                                  product.2$frequency)),
+                                  product.2$frequency,
+                                  product.3$frequency,
+                                  product.4$frequency,
+                                  product.5$frequency)),
                          decreasing = FALSE)
- 
+  
   base$Names[1] <- "Construction"
   base$duration[1] <- 0
   base$Names[length(base$frequency)] <- "END"
   base$duration[length(base$frequency)] <- 0
-
-
+  
   for(index in 2:(length(base$frequency) - 1)) {
     phase.1 <- product.1$event[which(product.1$frequency ==
                                        base$frequency[index])]
     phase.2 <- product.2$event[which(product.2$frequency ==
                                        base$frequency[index])]
-    if(length(phase.1) != 0 && length(phase.2) != 0) {
-      base$Names[index] <- paste(phase.1, phase.2)
+    phase.3 <- product.3$event[which(product.3$frequency ==
+                                       base$frequency[index])]
+    phase.4 <- product.4$event[which(product.4$frequency ==
+                                       base$frequency[index])]
+    phase.5 <- product.5$event[which(product.5$frequency ==
+                                       base$frequency[index])]
+    if(length(phase.1) != 0 && length(phase.2) != 0 && length(phase.3) != 0 && length(phase.4) != 0&& length(phase.5) != 0) {
+      base$Names[index] <- paste(phase.1, phase.2, phase.3, phase.4, phase.5)
       base$duration[index] <- max(p1.dur[which(names(p1.dur) == phase.1)],
-                                  p2.dur[which(names(p2.dur) == phase.2)])
-    } else if(length(phase.1) != 0 && length(phase.2) == 0) {
+                                  p2.dur[which(names(p2.dur) == phase.2)],
+                                  p3.dur[which(names(p3.dur) == phase.3)],
+                                  p4.dur[which(names(p4.dur) == phase.4)],
+                                  p5.dur[which(names(p5.dur) == phase.5)])
+    } else if(length(phase.1) != 0 && length(phase.2) == 0 && length(phase.3) == 0 && length(phase.4) == 0&& length(phase.5) == 0) {
       base$Names[index] <- phase.1
       base$duration[index] <- p1.dur[which(names(p1.dur) == phase.1)]
-    } else if (length(phase.1) == 0 && length(phase.2) != 0) {
+    } else if (length(phase.1) == 0 && length(phase.2) != 0 && length(phase.3) == 0 && length(phase.4) == 0&& length(phase.5) == 0) {
       base$Names[index] <- phase.2
       base$duration[index] <- p2.dur[which(names(p2.dur) == phase.2)]
+    } else if (length(phase.1) == 0 && length(phase.2) == 0 && length(phase.3) != 0 && length(phase.4) == 0&& length(phase.5) == 0) {
+      base$Names[index] <- phase.3
+      base$duration[index] <- p3.dur[which(names(p2.dur) == phase.3)]
+    } else if (length(phase.1) == 0 && length(phase.2) == 0 && length(phase.3) == 0 && length(phase.4) != 0&& length(phase.5) == 0) {
+      base$Names[index] <- phase.4
+      base$duration[index] <- p4.dur[which(names(p2.dur) == phase.4)]
+    } else if (length(phase.1) == 0 && length(phase.2) == 0 && length(phase.3) == 0 && length(phase.4) == 0&& length(phase.5) != 0) {
+      base$Names[index] <- phase.5
+      base$duration[index] <- p5.dur[which(names(p2.dur) == phase.5)]
     } else {
       base$duration[index] <- 0
     }
