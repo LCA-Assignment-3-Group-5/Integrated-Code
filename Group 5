@@ -108,7 +108,7 @@ par(mfrow = c(2, 1))
 start.Date = "2021-01-01"
 lifetime <- 100
 
-#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX------------Change
+#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX--------------------------------------------------------------------------------Change
 events.Op1.Bridge = c(SDO = 15, M = 5, DR = 30, END = lifetime)
 duration.ev.Bridge <- c(SDO = 7, M = 2, DR = 21) #Bridge
 events.Op1.Pylon <- c(SDO.r = 17, M.r = 7, R.r = 35, END = lifetime) #road
@@ -123,7 +123,7 @@ duration.ev.Barrier <- c(SDO.r = 7, M.r = 2, R.r = 21)
 
 design.Options.Bridge <- list(design.Op1.Bridge <- "Steel girder & precast concrete deck")
 design.Options.Pylon <- list(design.Op1.Pylon <- "Reinforced concrete cross section")
-#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX------------Change
+#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX--------------------------------------------------------------------------------Change
 design.Options.Tunnel <- list(design.Op1.Tunnel <- "Design opt????????????")
 design.Options.Pavement <- list(design.Op1.Pavement <- "Design opt?????????")
 design.Options.Barrier <- list(design.Op1.Barrier <- "GFRC Guard Barriers and Steel Crash Barrier")
@@ -140,8 +140,7 @@ integrated.interv <- combine.lifeTimelines(maintenance.Bridge, maintenance.Pylon
 sum(integrated.interv$duration)
 
 
-
-#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX------------Change
+#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX--------------------------------------------------------------------------------Change
 events.Op1.Bridge = c(SDO = 15, M = 5, DR = 30, END = lifetime)
 duration.ev.Bridge <- c(SDO = 7, M = 2, DR = 21)
 events.Op1.Pylon <- c(SDO.r = 17, M.r = 7, R.r = 35, END = lifetime) 
@@ -207,7 +206,7 @@ design.explore <- function(events1, events2, events3,events4,events5) {
 
 
 n.grid <- 5
-
+#XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX--------------------------------------------------------------------------------Change
 events.grid.Bridge <- expand.grid(SDO = sample(seq(1,20, by = 1), n.grid),
                                   M = sample(seq(2,9,1), n.grid),
                                   DR = sample(seq(2, 35, 1), n.grid))
